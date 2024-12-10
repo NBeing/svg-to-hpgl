@@ -1,0 +1,23 @@
+{
+  "name": "svg-to-hpgl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "html-webpack-plugin": "^5.6.3",
+    "serialport": "^12.0.0",
+    "svg-parser": "^2.0.4",
+    "svg-path-parser": "^1.1.0",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "devDependencies": {
+    "raw-loader": "^4.0.2"
+  }
+}
