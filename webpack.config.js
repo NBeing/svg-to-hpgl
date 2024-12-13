@@ -1,11 +1,13 @@
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+
 
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: {
-    main: path.resolve(__dirname, './src/svg_translation.js')
+    main: path.resolve(__dirname, './src/index.js')
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -27,6 +29,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({
         title: 'SVG to HPGL',
         template: path.resolve(__dirname, './src/index.html'),

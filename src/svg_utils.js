@@ -1,3 +1,4 @@
+
 // Adapted from drawbot: https://github.com/codekitchen/drawbot
 import { parseSVG, makeAbsolute } from '../3rd-party/svg-path-parser/index.js'
 import cubicCurve from '../3rd-party/adaptive-bezier-curve.js'
@@ -5,11 +6,10 @@ import quadraticCurve from '../3rd-party/adaptive-quadratic-curve.js'
 import arcToBezier from '../3rd-party/svg-arc-to-bezier.js';
 
 const curveScale = 1.0;
-import { parse } from 'svg-parser';
-import svgString from '../assets/statue_of_liberty_svg_omg.svg'
-console.log("RAW SVG!", svgString)
 
-// getPaths(parsedSvg)
+export const isCurve = (cmd) => {
+  return cmd.code == 'C' || cmd.code == 'S' || cmd.code == 'Q' || cmd.code == 'T';
+}
 
 export function pathFromSVG(svgStr) {
   const parser = new DOMParser();
@@ -104,65 +104,3 @@ export function svgToDrawbot(pathCommands, scale, translation) {
   return drawCommands;
 }
 
-function isCurve(cmd) {
-  return cmd.code == 'C' || cmd.code == 'S' || cmd.code == 'Q' || cmd.code == 'T';
-}
-
-let path = pathFromSVG(svgString)
-const commands = svgToDrawbot(path, 200, { x: 0, y: 0 });
-
-// We know we have this structure, (an array of these bad bois)
-// command: "moveTo"
-// ​​​pen: false
-// ​​x: 277.71
-// y: 158.52
-
-// PA x,y{,x,y{...}} 	Plot absolute [i] 
-// PD 	Pen down
-// PU 	Pen up 
-// AP 	Automatic pen pickup [i]
-// DF 	Set default values
-// IM e{,s{,p}} 	Input e, s and p masks [i]
-// IN 	Initialize
-// OE 	Output error [i]
-// OS 	Output status [i] 
-
-
-// The full set of supported commands is: PA, PR, PU, PD, CA, CP, CS, DI, DR, LB, SA, SI, SL, SM, SP, SR, SS, UC, LT, TL, VS, XT, YT, DF, DT, IM, IN, SC, DC, DP, OA, OC, OD, OE, OF, OH, OI, OO, OP, OS, OW, IP, IW.
-console.log("Commands!", commands)
-
-const initialize = "IN;"
-const selectPen = (penNumber) => `SP${penNumber};`
-const penDown = () => `PD;`
-const penUp = () => `PU;`
-const moveToAbsolute = (x,y) =>{
-  return `PA${x},${y};\n`
-}
-
-const commandsToPath = (commands) => commands.map( command  => {
-  const penState = command.pen ? "PD;" : "PU;"
-  const cmd = `${penState}${moveToAbsolute(command.x, command.y)}`
-  return cmd
-}).join("")
-
-const returnHPGLFromCommands = (commands) => {
-  return `
-    ${initialize}
-    ${selectPen(3)}
-    ${commandsToPath(commands)}
-    ${penUp()}
-    ${selectPen(0)}
-  `
-}
-
-const result = returnHPGLFromCommands(commands)
-console.log("Result", result)
-
-// ui
-const download = document.getElementById('download')
-console.log("Download", download)
-download.onclick = () => {
-  const textarea = document.getElementById('output')
-  console.log("Textarea", textarea)
-  textarea.innerHTML = result
-}
