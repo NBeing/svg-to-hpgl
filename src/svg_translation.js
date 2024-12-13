@@ -6,7 +6,7 @@ import arcToBezier from '../3rd-party/svg-arc-to-bezier.js';
 
 const curveScale = 1.0;
 import { parse } from 'svg-parser';
-import svgString from '../assets/logo-recursebot_cleaned.svg'
+import svgString from '../assets/statue_of_liberty_svg_omg.svg'
 console.log("RAW SVG!", svgString)
 
 // getPaths(parsedSvg)
