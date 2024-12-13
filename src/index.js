@@ -59,14 +59,19 @@ const result = returnHPGLFromCommands(commands)
 console.log("Result", result)
 
 // ui
-const download = document.getElementById('download')
-console.log("Download", download)
-download.onclick = () => {
-  const textarea = document.getElementById('output')
-  console.log("Textarea", textarea)
-  textarea.innerHTML = result
-}
+// const download = document.getElementById('download')
+// console.log("Download", download)
 
+// download.onclick = () => {
+//   const textarea = document.getElementById('output')
+//   console.log("Textarea", textarea)
+//   textarea.innerHTML = result
+// }
+
+const download = document.getElementById('drop_zone')
+console.log("Download", download)
+
+download.ondrop = dropHandler;
 
 const optimized = optimize(svgString, {
   path: 'path-to.svg', // recommended
@@ -77,3 +82,32 @@ const optimizedSvgString = optimized.data;
 
 console.log("Optimized!", optimizedSvgString)
 
+const input_textarea = document.getElementById('input')
+input_textarea.innerText = svgString
+
+
+const output_textarea = document.getElementById('output')
+output_textarea.innerText = optimizedSvgString
+
+function dropHandler(ev) {
+  console.log("File(s) dropped");
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+    [...ev.dataTransfer.items].forEach((item, i) => {
+      // If dropped items aren't files, reject them
+      if (item.kind === "file") {
+        const file = item.getAsFile();
+        console.log(`… file[${i}].name = ${file.name}`);
+      }
+    });
+  } else {
+    // Use DataTransfer interface to access the file(s)
+    [...ev.dataTransfer.files].forEach((file, i) => {
+      console.log(`… file[${i}].name = ${file.name}`);
+    });
+  }
+}
