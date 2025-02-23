@@ -15,7 +15,7 @@ export function pathFromSVG(svgStr) {
   const parser = new DOMParser();
   const svg = parser.parseFromString(svgStr, "image/svg+xml");
   const pathNodes = svg.querySelectorAll('path');
-  console.log("Path nodes", pathNodes)
+
   if (!pathNodes)
     return null;
   let commands = [];
@@ -25,7 +25,6 @@ export function pathFromSVG(svgStr) {
       continue;
     commands = commands.concat(makeAbsolute(parseSVG(path)));
   }
-  console.log("Intermediate commands", commands)
   return commands;
 }
 
