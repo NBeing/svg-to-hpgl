@@ -31,9 +31,6 @@ module.exports = {
           exclude: /node_modules/,
           use: [
             {
-              loader: 'solid-hot-loader',
-            },
-            {
               loader: 'babel-loader',
               options: {
                 presets: ['@babel/preset-env', 'solid'],
