@@ -3,11 +3,6 @@
 // v1.0 exported just the parser function. To maintain backwards compatibility,
 // we export additional named features as properties of that function.
 import { parse as parserFunction } from './parser.js';
-export {
-	parserFunction as default,
-	parserFunction as parseSVG,
-	makeSVGPathCommandsAbsolute as makeAbsolute,
-}
 
 function makeSVGPathCommandsAbsolute(commands) {
 	var subpathStart, prevCmd={x:0,y:0};
@@ -27,4 +22,9 @@ function makeSVGPathCommandsAbsolute(commands) {
 		prevCmd = cmd;
 	});
 	return commands;
+}
+module.exports  = {
+	default : parserFunction ,
+	parseSVG : parserFunction ,
+	makeAbsolute : makeSVGPathCommandsAbsolute ,
 }

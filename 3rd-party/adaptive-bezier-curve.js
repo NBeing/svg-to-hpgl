@@ -1,4 +1,3 @@
-export { createBezierBuilder as default }
 
 function clone(point) { //TODO: use gl-vec2 for this
     return [point[0], point[1]]
@@ -8,7 +7,7 @@ function vec2(x, y) {
     return [x, y]
 }
 
-function createBezierBuilder(opt) {
+export default function createBezierBuilder(opt) {
     opt = opt||{}
 
     var RECURSION_LIMIT = typeof opt.recursion === 'number' ? opt.recursion : 8

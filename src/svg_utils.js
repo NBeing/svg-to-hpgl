@@ -3,15 +3,15 @@
 import { parseSVG, makeAbsolute } from '../3rd-party/svg-path-parser/index.js'
 import cubicCurve from '../3rd-party/adaptive-bezier-curve.js'
 import quadraticCurve from '../3rd-party/adaptive-quadratic-curve.js'
-import arcToBezier from '../3rd-party/svg-arc-to-bezier.js';
+import { arcToBezier } from '../3rd-party/svg-arc-to-bezier.js';
 
 const curveScale = 1.0;
 
-export const isCurve = (cmd) => {
+const isCurve = (cmd) => {
   return cmd.code == 'C' || cmd.code == 'S' || cmd.code == 'Q' || cmd.code == 'T';
 }
 
-export function pathFromSVG(svgStr) {
+function pathFromSVG(svgStr) {
   const parser = new DOMParser();
   const svg = parser.parseFromString(svgStr, "image/svg+xml");
   const pathNodes = svg.querySelectorAll('path');
@@ -28,7 +28,7 @@ export function pathFromSVG(svgStr) {
   return commands;
 }
 
-export function svgToDrawbot(pathCommands, scale, translation) {
+function svgToDrawbot(pathCommands, scale, translation) {
   let drawCommands = [];
   let prevCmd = { x: 0, y: 0, code: '' };
   let pts, cp;
@@ -102,4 +102,8 @@ export function svgToDrawbot(pathCommands, scale, translation) {
   }
   return drawCommands;
 }
-
+module.exports = {
+  isCurve,
+  svgToDrawbot,
+  pathFromSVG  
+}
