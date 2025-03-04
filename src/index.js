@@ -1,3 +1,5 @@
+import './style.css';
+
 import { render } from 'solid-js/web';
 import { createSignal, createEffect } from "solid-js";
 import { prepareHPGLFromSVG } from './plotter_utils'
