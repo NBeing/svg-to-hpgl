@@ -1,8 +1,8 @@
 import { optimizeWithSVGO } from './svg_utils'
 import { svgToDrawbot, pathFromSVG } from '../3rd-party/codekitchens_svg_to_drawbot'
 
-const PLOTTER_X_MAX = 10900
-const PLOTTER_Y_MAX = 7650
+export const PLOTTER_X_MAX = 10900
+export const PLOTTER_Y_MAX = 7650
 
 const initialize = "IN;"
 const selectPen = (penNumber) => `SP${penNumber};`
@@ -50,7 +50,8 @@ const getBoundsFromCommands = (commands) => {
   return bounds
 }
 
-const getNewImageSize = (img) => {
+
+const getNewImageSize = (img, viewBox) => {
   // The plotter dimensions are as follows
   // x: 10900            y : 7650
   // but clearly, x is the long way on the paper
@@ -68,8 +69,9 @@ const getNewImageSize = (img) => {
   console.log("plotter_aspect: ", plotter_aspect)
   // 1.42 , meaning it is 1.42 times wider than it is long
 
-  let image_x = img.width// 1200
-  let image_y = img.height // 1082
+  let splitbox = viewBox.split(" ").map(str => parseFloat(str))
+  let image_x = img.width || splitbox[2] // 1200
+  let image_y = img.height || splitbox[3] // 1082
   console.log("Img x y", image_x, image_y)
   let image_aspect = image_x / image_y
 
@@ -145,30 +147,33 @@ function parseHPGLAndDrawToCanvas(hpgl_text, renderScaling = 1.0, _position = [0
   output_ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
   output_ctx.fillStyle = "#FFF";
   output_ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+  output_ctx.save()
 
   output_ctx.beginPath();
   instructions.forEach(instruction => {
-    // if(Object.hasOwn(instruction, "pen")){
-    //   output_ctx.beginPath();
-    //   console.log("Got it", instruction.pen)
-    //   output_ctx.fillStyle = pens[instruction.pen]
-    //   output_ctx.stroke()
-    //   return
-    // }
-
-    output_ctx[instruction.cmd]((instruction.x) * renderScaling, (instruction.y) * renderScaling)
+    // !notice! We eventually draw the coordinates inverting the x and y
+    // this is so that the print preview draws rotated 90 degrees counterclockwise
+    // as if you were looking at it coming out of the plotter
+    output_ctx[instruction.cmd]((instruction.y) * renderScaling, (instruction.x) * renderScaling)
   })
   output_ctx.stroke()
-  console.log("Done stroke")
+  output_ctx.restore()
 }
 
-export const prepareHPGLFromSVG = (scale = 1.0, position = [0, 0], _img, _canvas, basesvgstring, optimizedSVGString) => {
-  console.log("Positch", position)
+export const getCommandsFromSVG = (scale = 1.0, position = [0, 0], basesvgstring) => {
+  let optimizedSVGString = optimizeWithSVGO(basesvgstring)
+
+  let path = pathFromSVG(optimizedSVGString)
+  // Now we parse the SVG to coordinates for the plotter
+  const raw_commands = svgToDrawbot(path, 1.0, { x: position[0], y: position[1] },);
+  return raw_commands
+}
+export const prepareHPGLFromSVG = (scale = 1.0, position = [0, 0], _img, _canvas, basesvgstring, optimizedSVGString, viewBox) => {
   try {
     let _ctx = _canvas.getContext("2d") 
-    let [newX, newY, ratio] = getNewImageSize(_img)
-    _ctx.canvas.width = PLOTTER_X_MAX / 10
-    _ctx.canvas.height = PLOTTER_Y_MAX / 10
+    let [newX, newY, ratio] = getNewImageSize(_img, viewBox)
+    _ctx.canvas.height = PLOTTER_X_MAX / 20
+    _ctx.canvas.width = PLOTTER_Y_MAX / 20
 
     _ctx = _canvas.getContext("2d")
     // we then transform the paths to something we can parse
@@ -176,16 +181,16 @@ export const prepareHPGLFromSVG = (scale = 1.0, position = [0, 0], _img, _canvas
 
     let path = pathFromSVG(optimizedSVGString)
     // Now we parse the SVG to coordinates for the plotter
-    const commands = svgToDrawbot(path, ratio * scale, { x: position[0], y: position[1] },);
+    const raw_commands = svgToDrawbot(path, ratio * scale, { x: position[0], y: position[1] },);
 
     // once we have the coordinates, we can translate to hpgl 
-    let converted = returnHPGLFromCommands(commands)
-    const bounds = getBoundsFromCommands(commands)
+    let hpgl_commands = returnHPGLFromCommands(raw_commands)
+    const bounds = getBoundsFromCommands(raw_commands)
     // setBoundsMessage(bounds)
 
-    parseHPGLAndDrawToCanvas(converted, 1/10, position, _ctx, _canvas)
-    let blob = new Blob([converted], { type: "image/hpgl" });
-    return blob
+    parseHPGLAndDrawToCanvas(hpgl_commands, 1/20, position, _ctx, _canvas)
+    let blob = new Blob([hpgl_commands], { type: "image/hpgl" });
+    return {blob,hpgl_commands, raw_commands }
   } catch(e) {
     console.log("Error while preparing hpgl from svg", e)
   }

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@svgdotjs/svg.js": "^3.2.4",
     "@tailwindcss/postcss": "^4.0.9",
     "babel-preset-solid": "^1.9.5",
     "node-polyfill-webpack-plugin": "^4.1.0",
