@@ -26,7 +26,27 @@ module.exports = {
   module: {
     rules: [
         { test: /\.(glsl|vs|fs|vert|frag|svg)$/, exclude: /node_modules/, use: [ 'raw-loader' ]},
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env', 'solid'],
+                plugins: ["@babel/plugin-transform-modules-commonjs"]
+              },
+            },
+          ],
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader', 'postcss-loader'],
+        },
     ]
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'],
   },
   plugins: [
     new NodePolyfillPlugin(),

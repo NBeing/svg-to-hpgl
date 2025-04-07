@@ -2062,7 +2062,7 @@ function peg$parse(input, options) {
   }
 }
 
-export {
-  peg$SyntaxError as SyntaxError,
-  peg$parse as parse,
+module.exports = {
+  SyntaxError: peg$SyntaxError ,
+  parse: peg$parse ,
 };

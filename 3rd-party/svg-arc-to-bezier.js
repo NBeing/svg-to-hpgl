@@ -193,4 +193,6 @@ const arcToBezier = ({
   })
 }
 
-export default arcToBezier
+module.exports =  {
+  arcToBezier,
+}
