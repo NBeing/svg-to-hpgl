@@ -1,5 +1,5 @@
 
-// The Adapted from drawbot: https://github.com/codekitchen/drawbot
+// The code below is Adapted from drawbot: https://github.com/codekitchen/drawbot
 import { parseSVG, makeAbsolute } from './svg-path-parser/index.js'
 import cubicCurve from './adaptive-bezier-curve.js'
 import quadraticCurve from './adaptive-quadratic-curve.js'
@@ -20,10 +20,14 @@ function pathFromSVG(svgStr) {
     return null;
   let commands = [];
   for (let pathNode of pathNodes) {
+    let normalizedPathData = pathNode.getPathData({normalize: true});
+    pathNode.setPathData(normalizedPathData);
     const path = pathNode.getAttribute('d');
+
     if (!path)
       continue;
     commands = commands.concat(makeAbsolute(parseSVG(path)));
+    
   }
   return commands;
 }
@@ -42,6 +46,7 @@ function svgToDrawbot(pathCommands, scale, translation) {
       y: inp.y * scale + translation.y,
     }
   }
+
 
   for (let p of pathCommands) {
     switch (p.code) {
@@ -88,6 +93,7 @@ function svgToDrawbot(pathCommands, scale, translation) {
         }
         break;
       case 'A':
+        
         let curves = arcToBezier({ px: p.x0, py: p.y0, cx: p.x, cy: p.y, rx: p.rx, ry: p.ry, xAxisRotation: p.xAxisRotation, largeArcFlag: p.largeArc, sweepFlag: p.sweep });
         for (let curve of curves) {
           pts = cubicCurve()([p.x0, p.y0], [curve.x1, curve.y1], [curve.x2, curve.y2], [curve.x, curve.y], 1);
@@ -97,7 +103,7 @@ function svgToDrawbot(pathCommands, scale, translation) {
         }
         break;
       default:
-        throw new Error(`don't know command: ${p.code}`)
+        console.log(`svg path converter doesn't know command: ${p.code}`)
     }
   }
   return drawCommands;

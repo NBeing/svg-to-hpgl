@@ -106,12 +106,13 @@ const getNewImageSize = (img, viewBox) => {
   console.log("Scaled: ", scaled_x, scaled_y)
   return [scaled_x, scaled_y, ratio]
 }
-function parseHPGLAndDrawToCanvas(hpgl_text, renderScaling = 1.0, _position = [0, 0], output_ctx, outputCanvas) {
+export const parseHPGLAndDrawToCanvas = (hpgl_text, renderScaling = 1.0, _position = [0, 0], output_ctx, outputCanvas) => {
   console.log("PArsing hpgl to print preview ", output_ctx, outputCanvas, _position)
   const pens = {
     0: "#FF00FF",
     3: "#FFFF00"
   }
+  hpgl_text = hpgl_text.replace(";", ";\n")
   const trimmed = hpgl_text.trim()
   const split = trimmed.split(";").map(x => x.trim())
   let penState = 0
@@ -162,8 +163,10 @@ function parseHPGLAndDrawToCanvas(hpgl_text, renderScaling = 1.0, _position = [0
 
 export const getCommandsFromSVG = (scale = 1.0, position = [0, 0], basesvgstring) => {
   let optimizedSVGString = optimizeWithSVGO(basesvgstring)
-
+  
   let path = pathFromSVG(optimizedSVGString)
+  // let path = pathFromSVG(basesvgstring)
+  
   // Now we parse the SVG to coordinates for the plotter
   const raw_commands = svgToDrawbot(path, 1.0, { x: position[0], y: position[1] },);
   return raw_commands
@@ -185,8 +188,8 @@ export const prepareHPGLFromSVG = (scale = 1.0, position = [0, 0], _img, _canvas
 
     // once we have the coordinates, we can translate to hpgl 
     let hpgl_commands = returnHPGLFromCommands(raw_commands)
-    const bounds = getBoundsFromCommands(raw_commands)
-    // setBoundsMessage(bounds)
+    console.log("hpgl commands", hpgl_commands)
+    // const bounds = getBoundsFromCommands(raw_commands)
 
     parseHPGLAndDrawToCanvas(hpgl_commands, 1/20, position, _ctx, _canvas)
     let blob = new Blob([hpgl_commands], { type: "image/hpgl" });

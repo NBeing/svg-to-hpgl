@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #5192ED;
+    --color-primary: red;
     --color-secondary: black;
-    --color-tertiary: red;
+    --color-tertiary: #5192ED;
     --color-quaternary: green;
     --color-quinary: #A2C4F5;  }
 
@@ -17,6 +17,9 @@ html, body {
 #app {
     width:100%; 
     min-height:100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
 }
 input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance: none;
